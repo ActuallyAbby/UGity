@@ -7,6 +7,9 @@ assignees: wiizerdofwiierd
 
 ---
 
+**UGity version**
+The package version can be found in-editor via `Window > Package Manager`
+
 **Unity version**
 Please include the full Unity version (*Ex:* 2019.4.31f1)
 
