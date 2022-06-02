@@ -1,0 +1,21 @@
+{
+  "name": "cc.octothorpe.ugity",
+  "version": "0.7.0",
+  "displayName": "UGity",
+  "description": "Basic git VCS integration for the Unity Editor & Runtime",
+  "unity": "2020.2",
+  "documentationUrl": "https://github.com/wiizerdofwiierd/UGity/wiki",
+  "changelogUrl": "https://github.com/wiizerdofwiierd/UGity/blob/master/CHANGELOG.md",
+  "license": "MIT",
+  "licensesUrl": "https://github.com/wiizerdofwiierd/UGity/blob/master/LICENSE.md",
+  "keywords": [
+    "editor",
+    "vcs",
+    "git"
+  ],
+  "author": {
+    "name": "Abby R",
+    "email": "the.octothorpe@outlook.com",
+	"url": "https://octothorpe.cc/"
+  }
+}

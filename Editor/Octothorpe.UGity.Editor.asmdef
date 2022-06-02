@@ -1,0 +1,17 @@
+{
+    "name": "Octothorpe.UGity.Editor",
+    "references": [
+        "GUID:70c074c59a872794e8de61ebf995f2fc"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
