@@ -2,6 +2,7 @@
 ## Editor
 ### Fixed
 - Fixed(?) issue with "UGity - This should never be visible" windows appearing after re-compile `(#7)`
+- Fixed issue where commit message box would lose focus; tidied up visuals `(#8)`
 
 ### Added
 - Added background tasks with progress bars for pushing and pulling `(#11)`
@@ -9,6 +10,7 @@
 ## Runtime/Backend
 ### Fixed
 - `GitBranchWindow`: Extra windows now also call `DestroyImmediate` upon self-destruct
+- `EditorUtil`: Fixed `AddPlaceholder` placeholder visually conflicting with its textarea
 
 ### Added
 - Added `IAsyncGitClient`
@@ -23,6 +25,7 @@
 - `GitClient`: Implemented `IAsyncGitClient`
 - `GitConsoleWindow`: Updated `LogCommandOutput` to match new delegate parameters
 - `GitCommandTimeoutExeption` -> `GitCommandTimeoutException`
+- `GitEditorStyles`: Changed placeholder style as to not conflict as much on top of a text area
 
 ### Removed
 - `GitClient`: Removed delegates from the file

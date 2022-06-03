@@ -65,9 +65,7 @@ namespace Octothorpe.UGity.Editor
 
         private static readonly Lazy<GUIStyle> placeholder = new Lazy<GUIStyle>(() => EditorStyles.textArea.Customize()
             .WithBackground(GUIState.Normal, null)
-            .WithTextColor(GUIState.Normal, Color.gray)
-            .WithPadding(4, 4, 4, 4)
-            .WithMargin(8, 8, 4, 4)
+            .WithPadding(2, 2, 2, 2)
             .WithAlignment(TextAnchor.UpperLeft));
         
         private static readonly Lazy<GUIStyle> label = new Lazy<GUIStyle>(() => GUI.skin.label.Customize().WithRichText(true));

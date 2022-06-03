@@ -275,14 +275,20 @@ namespace Octothorpe.UGity.Editor.Util
                 }
             }
         }
-
+        
         public static string AddPlaceholder(string textArea, string placeholderText)
         {
             if(!string.IsNullOrEmpty(textArea)) return textArea;
             if(Event.current.type == EventType.Repaint)
             {
-                Rect rect = GUILayoutUtility.GetLastRect();
-                GitEditorStyles.Placeholder.Draw(rect, placeholderText, false, false, false, false);
+                // Add a fake 1px margin so the highlighted border on the original text area is not clipped
+                Rect rect = GUILayoutUtility.GetLastRect().Inset(1, 1, 1, 1);
+                
+                // Disabling the control was the only way I could get it to not steal focus
+                using(new EditorGUI.DisabledScope(true))
+                {
+                    GitEditorStyles.Placeholder.Draw(rect, new GUIContent(placeholderText), GUIUtility.GetControlID(FocusType.Passive));
+                }
             }
 
             return textArea;
