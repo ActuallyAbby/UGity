@@ -1,6 +1,6 @@
 {
   "name": "cc.octothorpe.ugity",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "displayName": "UGity",
   "description": "Basic git VCS integration for the Unity Editor & Runtime",
   "unity": "2020.2",
