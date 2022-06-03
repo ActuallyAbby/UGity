@@ -1,6 +1,7 @@
 # [Unreleased]
 ## Editor
-No functional changes to the editor assembly have been made
+### Changed
+- Improved message for prompt that appears when moving an asset to a location where it would be ignored
 
 ## Runtime/Backend
 ### Changed
