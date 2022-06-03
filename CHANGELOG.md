@@ -40,5 +40,5 @@
 ### Initial Push
 
 [Unreleased]: https://github.com/wiizerdofwiierd/UGity/compare/v0.7.1...HEAD
-[0.7.1]: https://github.com/wiizerdofwiierd/UGity/releases/tag/v0.7.1
+[0.7.1]: https://github.com/wiizerdofwiierd/UGity/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/wiizerdofwiierd/UGity/releases/tag/v0.7.0
