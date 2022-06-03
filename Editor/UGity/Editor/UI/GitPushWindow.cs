@@ -27,6 +27,15 @@ namespace Octothorpe.UGity.Editor.UI
             }
         }
 
+        private bool PushTags
+        {
+            get => this.pushTags;
+            set {
+                if(value != PushTags)
+                    SetPushTags(value);
+            }
+        }
+        
         private bool SetUpstream
         {
             get => this.setUpstream;
@@ -71,6 +80,7 @@ namespace Octothorpe.UGity.Editor.UI
         private string upstream;
         private string remoteBranch;
         private bool setUpstream;
+        private bool pushTags;
         private bool remoteBranchExists;
         private IReadOnlyCollection<CommitInfo> commits;
 
@@ -80,6 +90,7 @@ namespace Octothorpe.UGity.Editor.UI
         private GUIContent headerContent;
         private GUIContent upstreamDelimiter;
         private GUIContent newIcon;
+        private GUIContent pushTagsLabel;
         private GUIContent setUpstreamLabel;
         private GUIContent buttonContent;
         private GUIContent subHeaderContent;
@@ -113,6 +124,7 @@ namespace Octothorpe.UGity.Editor.UI
             this.headerContent = new GUIContent(string.Format("<b>{0}</b> →", this.localBranch));
             this.upstreamDelimiter = new GUIContent("/");
             this.newIcon = EditorUtil.CreateIconContent("PackageBadgeNew");
+            this.pushTagsLabel = new GUIContent("Push tags");
             this.commitIcon = new GUIContent(GitEditorStyles.CommitIcon);
             this.remotesFieldWidth = EditorUtil.GetMaximumWidth(this.remoteLabels, EditorStyles.popup);
             UpdateDynamicContent();
@@ -165,9 +177,11 @@ namespace Octothorpe.UGity.Editor.UI
             }
 
             EditorGUI.indentLevel--;
-
+            
             GUILayout.FlexibleSpace();
 
+            PushTags = EditorGUILayout.ToggleLeft(this.pushTagsLabel, PushTags, GitEditorStyles.Label);
+            
             using(new EditorGUI.DisabledScope(this.upstream == Destination))
                 SetUpstream = EditorGUILayout.ToggleLeft(this.setUpstreamLabel, SetUpstream, GitEditorStyles.Label);
 
@@ -297,6 +311,19 @@ namespace Octothorpe.UGity.Editor.UI
             }
         }
 
+        private void SetPushTags(bool pushTags)
+        {
+            this.pushTags = pushTags;
+
+            if(pushTags)
+                this.command.WithOption("--tags");
+            else
+                this.command.SetOption("--tags", null);
+
+            if(IsInitialized)
+                UpdateDynamicContent();
+        }
+        
         private void SetUpstreamOnPush(bool setUpstream)
         {
             this.setUpstream = setUpstream;

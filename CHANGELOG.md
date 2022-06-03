@@ -1,9 +1,11 @@
 # [Unreleased]
 ## Editor
-No functional changes to the editor assembly have been made
+### Added
+- `Git > Push`: Added 'Push tags' option
 
 ## Runtime/Backend
-No backend changes have been made
+### Added
+- `GitPushWindow`: Added 'Push tags' toggle
 
 # [0.7.1] - 2022-06-02
 ## Editor
