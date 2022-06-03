@@ -1,9 +1,24 @@
 # [Unreleased]
 ## Editor
+### Fixed
+- Fixed an issue where moving files would un-stage them
+- Fixed an issue where moving files would not move the associated meta file
+- Fixed an issue where error dialogs failed to display
+- Fixed an issue where untracked files would not be added during commit even when selected
+- Fixed an issue where no dialog would be displayed when failing to delete a branch
+- Fixed minor typo in the push window
+
 ### Added
 - `Git > Push`: Added 'Push tags' option
 
 ## Runtime/Backend
+### Fixed
+- `GitFileWatcher`: Fixed `OnWillMoveAsset` un-staging every file by default, and not moving meta files
+- `GitClient`: Fixed reversed logic for `Execute` and `TryExecute`
+- `GitCommitWindow`: Fixed incorrect conditions for adding/resetting files in `Commit`
+- `GitBranchWindow`: Fixed delete function silently failing
+- `GitPushWindow`: Corrected label text (*commit* -> *commit(s)*)
+
 ### Added
 - `GitPushWindow`: Added 'Push tags' toggle
 

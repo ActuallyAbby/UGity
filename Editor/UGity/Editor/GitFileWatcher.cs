@@ -96,18 +96,19 @@ Would you like to add the following asset to git?
 
             bool removeAfterMove = false;
 
-            int choice = 0;
-
             if(oldPathIsStaged && newPathIsIgnored)
-                choice = PromptMoveAsset(oldPath, newPath);
+            {
+                int choice = PromptMoveAsset(oldPath, newPath);
 
-            if(choice == 1)
-                return AssetMoveResult.FailedMove;
-            else if(choice == 0)
-                removeAfterMove = true;
+                if(choice == 1)
+                    return AssetMoveResult.FailedMove;
+                else if(choice == 0)
+                    removeAfterMove = true;
+            }
 
-            //git mv the file to the new location
+            //git mv the file and its associated meta file (if it exists) to the new location
             client.Execute(new GitCommand("mv").WithArgument(oldPath, true).WithArgument(newPath, true));
+            client.TryExecute(new GitCommand("mv").WithArgument(oldPath + ".meta", true).WithArgument(newPath + ".meta", true));
 
             if(removeAfterMove)
                 client.RemoveAsset(newPath);

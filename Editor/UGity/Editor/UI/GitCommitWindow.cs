@@ -176,11 +176,11 @@ namespace Octothorpe.UGity.Editor.UI
                 bool isInCommit = included.Contains(change);
 
                 // File is included, and changes from the working tree have been staged. Do nothing
-                if(isInCommit && change.StateInTree == GitState.Unmodified)
+                if(isInCommit && !change.IsUntracked && change.StateInTree == GitState.Unmodified)
                     continue;
 
                 // File is included, and has changed in the working tree. Keep track of it so we can stage the changes
-                else if(isInCommit && change.StateInTree != GitState.Unmodified)
+                else if(isInCommit && (change.IsUntracked || change.StateInTree != GitState.Unmodified))
                     addForCommit.Add(change.Path);
 
                 // File is NOT included, and has staged changes. Keep track of it so we can temporarily remove it

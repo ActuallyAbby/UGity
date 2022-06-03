@@ -21,6 +21,7 @@ namespace Octothorpe.UGity.Editor.UI
                     Name = "Create Branch",
                     FormatString = "➕ New Branch",
                     Action = PromptAction<string>(Create, "Create", "Branch Name"),
+                    RefreshOnClick = true,
                 },
             };
 
@@ -241,7 +242,9 @@ namespace Octothorpe.UGity.Editor.UI
 
             private static void Delete(IGitClient client, string head, string selectedBranch)
             {
-                window.Client.Execute(Git.Branch.WithOption("-d").WithArgument(selectedBranch));
+                GitCommandResult result = client.Execute(Git.Branch.WithOption("-d").WithArgument(selectedBranch));
+                if(result.ExitCode != 0)
+                    throw new GitClientException(result);
             }
 
             private class BranchMenuItem

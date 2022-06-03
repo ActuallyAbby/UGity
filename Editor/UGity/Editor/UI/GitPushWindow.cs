@@ -340,7 +340,7 @@ namespace Octothorpe.UGity.Editor.UI
         private void UpdateDynamicContent()
         {
             string text = string.Format(
-                "You are about to push <b>{0}</b> commits on {1}remote branch <b>{2}</b>:",
+                "You are about to push <b>{0}</b> commit(s) on {1}remote branch <b>{2}</b>:",
                 this.commits.Count,
                 this.remoteBranchExists ? "" : "<color=#4fbb48>new</color> ",
                 this.remoteBranch);

@@ -60,12 +60,12 @@ namespace Octothorpe.UGity.Client
         
         public virtual GitCommandResult Execute(IGitCommand command, string options = null, int timeout = DEFAULT_TIMEOUT)
         {
-            return ExecuteInternal(command, options, timeout, false);
+            return ExecuteInternal(command, options, timeout, true);
         }
         
         public virtual GitCommandResult TryExecute(IGitCommand command, string options = null, int timeout = DEFAULT_TIMEOUT)
         {
-            return ExecuteInternal(command, options, timeout, true);
+            return ExecuteInternal(command, options, timeout, false);
         }
         
         public virtual TResult Execute<TSelf, TResult>(GitCommand<TSelf, TResult> command, string options = "", int timeout = DEFAULT_TIMEOUT)
