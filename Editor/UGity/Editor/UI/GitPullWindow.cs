@@ -134,8 +134,13 @@ namespace Octothorpe.UGity.Editor.UI
                 EditorGUILayout.HelpBox("No remotes defined", MessageType.Error, true);
 
             using(new EditorGUI.DisabledScope(!isRemoteAvailable))
+            {
                 if(GUILayout.Button(new GUIContent(GitConsoleWindow.CARET + this.command.ToString()), GitEditorStyles.TerminalButton))
+                {
                     this.Close();
+                    StartPull();
+                }
+            }
         }
         
         private bool GetBoolOption(string name)
@@ -221,30 +226,24 @@ namespace Octothorpe.UGity.Editor.UI
             UpdateOptions();
         }
 
-        private void ConfirmPull()
+        private async void StartPull()
         {
-            this.Close();
-            
-            Client.OnOutputLine += OnOutput;
-            Client.OnErrorLine += OnError;
+            string taskName = $"Pulling {this.localBranch} ← {this.pullSources[this.selectedSource]}";
 
-            try
+            using(var task = new GitProgressReporter(Client, GitProgressReporter.Task.Push, taskName))
             {
-                Client.Execute(this.command.WithOption("--porcelain"), timeout: 20000);
-            }
-            catch(GitFatalErrorException e)
-            {
-                EditorUtility.DisplayDialog("Push Failed", e.Message, "Ok");
-            }
-
-            void OnOutput(string line)
-            {
-                Debug.Log(line);
-            }
-
-            void OnError(string line)
-            {
-                Debug.LogWarning(line);
+                try
+                {
+                    await Client.ExecuteAsync(this.command.WithOption("--progress"), token: task.Token);
+                }
+                catch(GitClientException e)
+                {
+                    EditorUtility.DisplayDialog("Pull Failed", e.Message, "Close");
+                }
+                finally
+                {
+                    task.Complete();
+                }
             }
         }
 

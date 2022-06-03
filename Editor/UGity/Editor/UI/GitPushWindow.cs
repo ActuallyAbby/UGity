@@ -1,4 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Octothorpe.UGity.Client;
 using Octothorpe.UGity.Editor.Util;
@@ -106,8 +111,8 @@ namespace Octothorpe.UGity.Editor.UI
             this.commits = new List<CommitInfo>(GetUnpushedCommits());
             if(this.commits.Count == 0)
             {
-                this.Close();
-                EditorUtility.DisplayDialog("No Changes", "There are no changes to push.", "Close");
+                //this.Close();
+                //EditorUtility.DisplayDialog("No Changes", "There are no changes to push.", "Close");
             }
 
             this.remotes = Client.GetRemotes();
@@ -189,8 +194,8 @@ namespace Octothorpe.UGity.Editor.UI
             {
                 if(GUILayout.Button(this.buttonContent, GitEditorStyles.TerminalButton))
                 {
-                    Push();
                     this.Close();
+                    StartPush();
                 }
             }
         }
@@ -235,28 +240,24 @@ namespace Octothorpe.UGity.Editor.UI
             return false;
         }
         
-        private void Push()
+        private async void StartPush()
         {
-            Client.OnOutputLine += OnOutput;
-            Client.OnErrorLine += OnError;
+            string taskName = $"Pushing {this.localBranch} → {Destination}";
             
-            try
+            using(var task = new GitProgressReporter(Client, GitProgressReporter.Task.Push, taskName))
             {
-                Client.Execute(this.command.WithOption("--porcelain").WithOption("--progress"), timeout: 20000);
-            }
-            catch(GitFatalErrorException e)
-            {
-                EditorUtility.DisplayDialog("Push Failed", e.Message, "Close");
-            }
-
-            void OnOutput(string line)
-            {
-                Debug.Log(line);
-            }
-
-            void OnError(string line)
-            {
-                Debug.LogWarning(line);
+                try
+                {
+                    await Client.ExecuteAsync(this.command.WithOption("--progress"), token: task.Token);
+                }
+                catch(GitClientException e)
+                {
+                    EditorUtility.DisplayDialog("Push Failed", e.Message, "Close");
+                }
+                finally
+                {
+                    task.Complete();
+                }
             }
         }
 

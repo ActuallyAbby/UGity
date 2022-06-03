@@ -202,37 +202,6 @@ namespace Octothorpe.UGity.Editor
             Execute(new GitCommand("init"));
             EditorUtil.StartCoroutine(Instance.FetchIgnoreTemplate(), () => Log("Local repository initialized!"));
         }
-        
-        public void Pull()
-        {
-            try
-            {
-                OnOutputLine += OnOutput;
-                OnErrorLine += OnError;
-                OnFinishedExecuting += OnExit;
-                
-                GitCommandResult result = Execute(new GitCommand("pull").WithOption("--all").WithOption("--dry-run").WithOption("--progress"), timeout: 20000);
-            }
-            catch(GitFatalErrorException e)
-            {
-                EditorUtility.DisplayDialog("Pull Failed", e.Message, "Ok");
-            }
-
-            void OnOutput(string line)
-            {
-                Debug.Log(line);
-            }
-
-            void OnError(string line)
-            {
-                Debug.LogWarning(line);
-            }
-
-            void OnExit()
-            {
-                Debug.Log("Finished executing");
-            }
-        }
 
         private IEnumerator FetchIgnoreTemplate()
         {
