@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 
 using Octothorpe.UGity.Client;
 using Octothorpe.UGity.Editor.Persistence;
@@ -14,9 +13,12 @@ namespace Octothorpe.UGity.Editor
     public class GitFileWatcher : UnityEditor.AssetModificationProcessor
     {
         const string PROMPT_FORMAT_IGNORE = @"
-Tracked file
+Tracked file:
 {0}
-Would be ignored at new location
+
+Would be ignored at new location:
+{1}
+
 Do you want to remove this file from git?
 ";
         
@@ -61,8 +63,6 @@ Would you like to add the following asset to git?
 
         protected static void OnWillCreateAsset(string path)
         {
-            if(!path.StartsWith(client.WorkingDirectory)) return;
-            
             if(client == null) return;
 
             if(path.StartsWith(GitEditorState.STATE_FILE))
@@ -80,16 +80,12 @@ Would you like to add the following asset to git?
 
         protected static AssetDeleteResult OnWillDeleteAsset(string path, RemoveAssetOptions options)
         {
-            if(!path.StartsWith(client.WorkingDirectory)) return AssetDeleteResult.DidNotDelete;
-            
             client.RemoveAsset(path);
             return AssetDeleteResult.DidNotDelete;
         }
 
         protected static AssetMoveResult OnWillMoveAsset(string oldPath, string newPath)
-{
-            if(!newPath.StartsWith(client.WorkingDirectory)) return AssetMoveResult.DidNotMove;
-
+        {
             GitFile file = client.Execute(Git.Status
                 .WithOption("--untracked-files")
                 .WithOption("--ignored")
@@ -103,7 +99,7 @@ Would you like to add the following asset to git?
             int choice = 0;
 
             if(oldPathIsStaged && newPathIsIgnored)
-                choice = PromptMoveAsset(oldPath);
+                choice = PromptMoveAsset(oldPath, newPath);
 
             if(choice == 1)
                 return AssetMoveResult.FailedMove;
@@ -119,9 +115,9 @@ Would you like to add the following asset to git?
             return AssetMoveResult.DidMove;
         }
 
-        private static int PromptMoveAsset(string path)
+        private static int PromptMoveAsset(string oldPath, string newPath)
         {
-            string message = string.Format(PROMPT_FORMAT_IGNORE, path);
+            string message = string.Format(PROMPT_FORMAT_IGNORE, oldPath, newPath);
             return EditorUtility.DisplayDialogComplex("Tracked State Mismatch", message, "Remove", "Cancel Move", "Keep Added");
         }
 
