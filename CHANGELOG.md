@@ -1,5 +1,32 @@
 # [Unreleased]
-No unreleased changes
+## Editor
+### Fixed
+- Fixed(?) issue with "UGity - This should never be visible" windows appearing after re-compile `(#7)`
+
+### Added
+- Added background tasks with progress bars for pushing and pulling `(#11)`
+
+## Runtime/Backend
+### Fixed
+- `GitBranchWindow`: Extra windows now also call `DestroyImmediate` upon self-destruct
+
+### Added
+- Added `IAsyncGitClient`
+- Added `GitProgressReporter` - Uses `IAsyncGitClient` to track the progress of commands such as `push` and `pull` asynchronously in the background
+- `GitPullWindow`: Implemented async pull function with progress bar
+- `GitPushWindow`: Implemented async push function with progress bar
+- `IGitClient`: Added delegates used by `GitClient` in this file at the namespace level
+- `IGitClient`: Added events from `GitClient` to the base interface
+
+### Changed
+- `IGitClient`: Improved documentation
+- `GitClient`: Implemented `IAsyncGitClient`
+- `GitConsoleWindow`: Updated `LogCommandOutput` to match new delegate parameters
+- `GitCommandTimeoutExeption` -> `GitCommandTimeoutException`
+
+### Removed
+- `GitClient`: Removed delegates from the file
+- `GitEditorClient`: Removed `Pull()`
 
 # [0.7.2] - 2022-06-03
 ## Editor

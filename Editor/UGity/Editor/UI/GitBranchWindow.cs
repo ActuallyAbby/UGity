@@ -47,7 +47,7 @@ namespace Octothorpe.UGity.Editor.UI
             EditorApplication.update -= KeepWindowAlive;
             EditorApplication.update += KeepWindowAlive;
         }
-
+        
         protected override void OnInitialize() => this.isDirty = true;
 
         protected override void OnDraw()
@@ -101,9 +101,14 @@ namespace Octothorpe.UGity.Editor.UI
         public void OnInspectorUpdate()
         {
             if(this != window)
+            {
                 this.Close();
+                DestroyImmediate(this);
+            }
             else
-                Repaint();
+            {
+                Repaint();                
+            }
         }
 
         private static void KeepWindowAlive()
