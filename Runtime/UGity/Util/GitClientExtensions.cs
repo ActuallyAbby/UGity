@@ -72,14 +72,7 @@ namespace Octothorpe.UGity.Util
                 .WithOption("-1")
                 .WithOption("--pretty", "%B");
 
-            try
-            {
-                return client.Execute(command).Output;
-            }
-            catch(GitFatalErrorException)
-            {
-                return null;
-            }
+            return client.TryExecute(command)?.Output;
         }
         
         public static string GetHeadHash(this IGitClient client)
@@ -88,31 +81,17 @@ namespace Octothorpe.UGity.Util
                 .WithOption("--short")
                 .WithArgument("HEAD");
 
-            try
-            {
-                return client.Execute(command).Output.Trim();
-            }
-            catch(GitFatalErrorException)
-            {
-                return null;
-            }
+            return client.TryExecute(command)?.Output?.Trim();
         }
 
         public static string GetHeadDisplayName(this IGitClient client) => GetBranchName(client) ?? GetHeadHash(client);
         
         public static string GetUpstream(this IGitClient client, string branch = "")
         {
-            try
-            {
-                return client.Execute(new GitCommand("rev-parse")
+            return client.TryExecute(new GitCommand("rev-parse")
                 .WithOption("--abbrev-ref")
                 .WithOption("--symbolic-full-name")
-                .WithArgument(branch + "@{upstream}")).Output.Trim();
-            }
-            catch(GitFatalErrorException)
-            {
-                return null;
-            }
+                .WithArgument(branch + "@{upstream}"))?.Output?.Trim();
         }
         
         public static string ValidateBranchName(this IGitClient client, string name)

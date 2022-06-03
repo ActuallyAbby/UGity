@@ -188,23 +188,38 @@ namespace Octothorpe.UGity.Editor.UI
                     resetForCommit.Add(change.Path);
             }
 
-            if(addForCommit.Count > 0)
-                Client.Execute(Git.Add.WithPathspec(addForCommit));
+            // Add files that need to be added
+            foreach(string path in addForCommit)
+                Client.TryExecute(Git.Add.WithPathspec(path));
 
-            if(resetForCommit.Count > 0)
-                Client.Execute(Git.Reset.WithPathspec(resetForCommit));
+            // Reset files that are already added, but not in the commit
+            foreach(string path in resetForCommit)
+                Client.TryExecute(Git.Reset.WithPathspec(path));
 
-            Client.Execute(command);
+            // Execute the commit command and display a success message
+            try
+            {
+                Client.Execute(command);
 
-            if(resetForCommit.Count > 0)
-                Client.Execute(Git.Add.WithOption("--ignore-errors").WithPathspec(resetForCommit));
+                IsAmending = false;
+                CommitMessage = "";
+                
+                this.lastCommitHash = Client.GetHeadHash();
+                EditorUtility.DisplayDialog("Success!", $"{included.Count} file(s) committed\nHEAD is now at {this.lastCommitHash}", "Close");
+            }
+            // Display a failure message if execution of the commit command threw an exception
+            catch(GitClientException e)
+            {
+                EditorUtility.DisplayDialog("Commit Failed", e.Message, "Close");
+            }
+            // Ensure the reset files are always re-added
+            finally
+            {
+                foreach(string path in resetForCommit)
+                    Client.TryExecute(Git.Add.WithOption("--ignore-errors").WithPathspec(resetForCommit));
 
-            IsAmending = false;
-            CommitMessage = "";
-            Refresh();
-
-            this.lastCommitHash = Client.GetHeadHash();
-            EditorUtility.DisplayDialog("Success!", $"{included.Count} file(s) committed\nHEAD is now at {this.lastCommitHash}", "Close");
+                Refresh();
+            } 
         }
 
         private void DrawToolbar(Rect rect)

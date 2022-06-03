@@ -56,13 +56,37 @@ namespace Octothorpe.UGity.Client
             this.processInfo.RedirectStandardError = true;
 
             this.builder = new StringBuilder();
-        }
-
+        }      
+        
         public virtual GitCommandResult Execute(IGitCommand command, string options = null, int timeout = DEFAULT_TIMEOUT)
+        {
+            return ExecuteInternal(command, options, timeout, false);
+        }
+        
+        public virtual GitCommandResult TryExecute(IGitCommand command, string options = null, int timeout = DEFAULT_TIMEOUT)
+        {
+            return ExecuteInternal(command, options, timeout, true);
+        }
+        
+        public virtual TResult Execute<TSelf, TResult>(GitCommand<TSelf, TResult> command, string options = "", int timeout = DEFAULT_TIMEOUT)
+            where TSelf : GitCommand<TSelf, TResult>
+            where TResult : GitCommandResult, new()
+        {
+            return (TResult) Execute((IGitCommand) command, options, timeout);
+        }
+        
+        public virtual TResult TryExecute<TSelf, TResult>(GitCommand<TSelf, TResult> command, string options = "", int timeout = DEFAULT_TIMEOUT)
+            where TSelf : GitCommand<TSelf, TResult>
+            where TResult : GitCommandResult, new()
+        {
+            return (TResult) TryExecute((IGitCommand) command, options, timeout);
+        }
+        
+        private GitCommandResult ExecuteInternal(IGitCommand command, string options, int timeout, bool ignoreFatalErrors)
         {
             try
             {
-                return ExecuteInternal(command, options, timeout);
+                return ExecuteInternal1(command, options, timeout, ignoreFatalErrors);
             }
             finally
             {
@@ -73,15 +97,8 @@ namespace Octothorpe.UGity.Client
                 this.OnFinishedExecuting = null;
             }
         }
-        
-        public virtual TResult Execute<TSelf, TResult>(GitCommand<TSelf, TResult> command, string options = "", int timeout = DEFAULT_TIMEOUT)
-            where TSelf : GitCommand<TSelf, TResult>
-            where TResult : GitCommandResult, new()
-        {
-            return (TResult) Execute((IGitCommand) command, options, timeout);
-        }
 
-        private GitCommandResult ExecuteInternal(IGitCommand command, string options, int timeout)
+        private GitCommandResult ExecuteInternal1(IGitCommand command, string options, int timeout, bool throwExceptions)
         {
             // Validate the paths provided to ensure that commands intended to target a specific path do not accidentally run with no path
             ValidatePathspec(command.Pathspec);
@@ -113,20 +130,30 @@ namespace Octothorpe.UGity.Client
                 int exitCode = process.ExitCode;
                 string output = outputBuilder.ToString().TrimEnd();
                 string error = errorBuilder.ToString().TrimEnd();
-
+                
                 GitCommandResult result = command.ParseResult(exitCode, output, error);
 
                 this.OnCommandResult?.Invoke(command, result);
 
                 if(exitCode == 128)
-                    throw new GitFatalErrorException(error);
+                {
+                    if(throwExceptions)
+                        throw new GitFatalErrorException(error);
+                    else
+                        return null;
+                }
 
                 return result;
+
             }
             else
             {
                 process.Kill();
-                throw new GitClientException("Command execution timed out");
+
+                if(throwExceptions)
+                    throw new GitCommandTimeoutExeption(command);
+                else
+                    return null;
             }
 
             void ForwardOutput(object sender, DataReceivedEventArgs args)
