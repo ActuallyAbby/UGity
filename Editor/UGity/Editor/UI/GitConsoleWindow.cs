@@ -96,7 +96,7 @@ namespace Octothorpe.UGity.Editor.UI
             unmatchedEntries.Add(command, entryIndex);
         }
 
-        public static void LogCommandOutput(IGitCommand command, GitCommandResult result)
+        public static void LogCommandOutput(IGitCommand command, bool completed, GitCommandResult result)
         {
             if(!unmatchedEntries.TryGetValue(command, out int entryIndex))
                 throw new GitEditorException("Can not log output for an unlogged command");
@@ -338,6 +338,8 @@ namespace Octothorpe.UGity.Editor.UI
 
             public void SetDetails(GitCommandResult result)
             {
+                if(result == null) return;
+                
                 bool hasErrorOutput = !string.IsNullOrEmpty(result.Error);
 
                 Details = (hasErrorOutput ? result.Output : result.Error);

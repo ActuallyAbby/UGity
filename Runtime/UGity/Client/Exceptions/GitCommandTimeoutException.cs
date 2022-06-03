@@ -1,9 +1,9 @@
 ﻿namespace Octothorpe.UGity.Client
 {
-    public class GitCommandTimeoutExeption : GitClientException
+    public class GitCommandTimeoutException : GitClientException
     {
-        public GitCommandTimeoutExeption(IGitCommand command) : base("Execution of command git " + command.Name + " timed out") { }
+        public GitCommandTimeoutException(IGitCommand command) : base("Execution of command git " + command.Name + " timed out") { }
         
-        public GitCommandTimeoutExeption(string message) : base(message) { }
+        public GitCommandTimeoutException(string message) : base(message) { }
     }
 }

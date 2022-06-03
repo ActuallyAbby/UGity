@@ -1,10 +1,11 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Octothorpe.UGity.Client
 {
-    public partial class GitClient : IGitClient
+    public partial class GitClient : IGitClient, IAsyncGitClient
     {
         /// <summary>
         /// Default command timeout (in millis)
@@ -12,23 +13,14 @@ namespace Octothorpe.UGity.Client
         private const int DEFAULT_TIMEOUT = 2000;
 
         /// <summary>
-        /// Event fired when a line is written to standard output during command execution.</br>
-        /// This event fires once and will be unregistered after the command has finished executing.
+        /// Period in which asynchronously executed commands check for cancellation
         /// </summary>
-        public event GitOutputDelegate OnOutputLine;
-        
-        /// <summary>
-        /// Event fired when a line is written to standard error during command execution.</br>
-        /// This event fires once and will be unregistered after the command has finished executing.
-        /// </summary>
-        public event GitOutputDelegate OnErrorLine;
+        private const int ASYNC_POLL_RATE = 500;
 
-        /// <summary>
-        /// Event fired when a command has finished executing.
-        /// This event fires once after this next command is executed, and is then unregistered.
-        /// </summary>
-        public event Action OnFinishedExecuting;
-        
+        public event AsyncOutputDelegate OnOutputLine;
+        public event AsyncOutputDelegate OnErrorLine;
+        public event AsyncTerminationDelegate OnFinishedExecuting;
+
         public event CommandExecuteDelegate OnCommandExecute;
         public event CommandResultDelegate OnCommandResult;
 
@@ -40,11 +32,7 @@ namespace Octothorpe.UGity.Client
 
         private StringBuilder builder;
         private ProcessStartInfo processInfo;
-
-        public delegate void GitOutputDelegate(string line);
-        public delegate void CommandExecuteDelegate(string gitOptions, IGitCommand command);
-        public delegate void CommandResultDelegate(IGitCommand command, GitCommandResult result);
-
+        
         public GitClient(string workingDirectory = "/")
         {
             this.processInfo = new ProcessStartInfo();
@@ -56,66 +44,31 @@ namespace Octothorpe.UGity.Client
             this.processInfo.RedirectStandardError = true;
 
             this.builder = new StringBuilder();
-        }      
-        
-        public virtual GitCommandResult Execute(IGitCommand command, string options = null, int timeout = DEFAULT_TIMEOUT)
-        {
-            return ExecuteInternal(command, options, timeout, true);
         }
-        
-        public virtual GitCommandResult TryExecute(IGitCommand command, string options = null, int timeout = DEFAULT_TIMEOUT)
-        {
-            return ExecuteInternal(command, options, timeout, false);
-        }
-        
-        public virtual TResult Execute<TSelf, TResult>(GitCommand<TSelf, TResult> command, string options = "", int timeout = DEFAULT_TIMEOUT)
-            where TSelf : GitCommand<TSelf, TResult>
-            where TResult : GitCommandResult, new()
-        {
-            return (TResult) Execute((IGitCommand) command, options, timeout);
-        }
-        
-        public virtual TResult TryExecute<TSelf, TResult>(GitCommand<TSelf, TResult> command, string options = "", int timeout = DEFAULT_TIMEOUT)
-            where TSelf : GitCommand<TSelf, TResult>
-            where TResult : GitCommandResult, new()
-        {
-            return (TResult) TryExecute((IGitCommand) command, options, timeout);
-        }
-        
-        private GitCommandResult ExecuteInternal(IGitCommand command, string options, int timeout, bool ignoreFatalErrors)
-        {
-            try
-            {
-                return ExecuteInternal1(command, options, timeout, ignoreFatalErrors);
-            }
-            finally
-            {
-                this.OnOutputLine = null;
-                this.OnErrorLine = null;
 
-                this.OnFinishedExecuting?.Invoke();
-                this.OnFinishedExecuting = null;
+        public virtual async Task<GitCommandResult> ExecuteAsync(IGitCommand command, string options = "", int timeout = DEFAULT_TIMEOUT)
+        {
+            using(var source = new CancellationTokenSource())
+            {
+                source.CancelAfter(timeout);
+                return await ExecuteAsync(command, options, source.Token);
             }
         }
 
-        private GitCommandResult ExecuteInternal1(IGitCommand command, string options, int timeout, bool throwExceptions)
+        public virtual async Task<GitCommandResult> ExecuteAsync(IGitCommand command, string options = "", CancellationToken token = default)
         {
-            // Validate the paths provided to ensure that commands intended to target a specific path do not accidentally run with no path
-            ValidatePathspec(command.Pathspec);
-
-            this.builder.Clear();
-
-            if(!string.IsNullOrWhiteSpace(options))
-                this.builder.Append(options.Trim()).Append(" ");
-
-            command.ToString(this.builder);
-
-            this.processInfo.Arguments = this.builder.ToString();
-
-            Process process = Process.Start(this.processInfo);
+            Process process = StartCommandProcess(command, options);
 
             StringBuilder outputBuilder = new StringBuilder();
             StringBuilder errorBuilder = new StringBuilder();
+
+            AsyncOutputDelegate outFuncs = this.OnOutputLine;
+            AsyncOutputDelegate errFuncs = this.OnErrorLine;
+            AsyncTerminationDelegate exitFuncs = this.OnFinishedExecuting;
+
+            this.OnOutputLine = null;
+            this.OnErrorLine = null;
+            this.OnFinishedExecuting = null;
 
             process.OutputDataReceived += ForwardOutput;
             process.ErrorDataReceived += ForwardError;
@@ -123,37 +76,22 @@ namespace Octothorpe.UGity.Client
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
 
-            this.OnCommandExecute?.Invoke(options, command);
-
-            if(process.WaitForExit(timeout))
+            while(true)
             {
-                int exitCode = process.ExitCode;
-                string output = outputBuilder.ToString().TrimEnd();
-                string error = errorBuilder.ToString().TrimEnd();
-                
-                GitCommandResult result = command.ParseResult(exitCode, output, error);
-
-                this.OnCommandResult?.Invoke(command, result);
-
-                if(exitCode == 128)
+                if(process.HasExited)
                 {
-                    if(throwExceptions)
-                        throw new GitFatalErrorException(error);
-                    else
-                        return null;
+                    GitCommandResult result = GetCompletedResult(command, process.ExitCode, outputBuilder.ToString(), errorBuilder.ToString(), true);
+                    exitFuncs?.Invoke(result, true);
+                    return result;
+                }
+                else if(token.IsCancellationRequested)
+                {
+                    process.Kill();
+                    exitFuncs?.Invoke(null, false);
+                    return GetTimedOutResult(command, true);
                 }
 
-                return result;
-
-            }
-            else
-            {
-                process.Kill();
-
-                if(throwExceptions)
-                    throw new GitCommandTimeoutExeption(command);
-                else
-                    return null;
+                await Task.Delay(ASYNC_POLL_RATE);
             }
 
             void ForwardOutput(object sender, DataReceivedEventArgs args)
@@ -161,7 +99,7 @@ namespace Octothorpe.UGity.Client
                 if(args.Data != null)
                 {
                     outputBuilder.AppendLine(args.Data);
-                    this.OnOutputLine?.Invoke(args.Data);
+                    outFuncs?.Invoke(args.Data);
                 }
             }
 
@@ -170,11 +108,35 @@ namespace Octothorpe.UGity.Client
                 if(args.Data != null)
                 {
                     errorBuilder.AppendLine(args.Data);
-                    this.OnErrorLine?.Invoke(args.Data);
+                    errFuncs?.Invoke(args.Data);
                 }
             }
         }
+        
+        public virtual TResult Execute<TSelf, TResult>(GitCommand<TSelf, TResult> command, string options = "", int timeout = DEFAULT_TIMEOUT)
+            where TSelf : GitCommand<TSelf, TResult>
+            where TResult : GitCommandResult, new()
+        {
+            return (TResult) Execute((IGitCommand) command, options, timeout);
+        }
 
+        public virtual TResult TryExecute<TSelf, TResult>(GitCommand<TSelf, TResult> command, string options = "", int timeout = DEFAULT_TIMEOUT)
+            where TSelf : GitCommand<TSelf, TResult>
+            where TResult : GitCommandResult, new()
+        {
+            return (TResult) TryExecute((IGitCommand) command, options, timeout);
+        }
+        
+        public virtual GitCommandResult Execute(IGitCommand command, string options = "", int timeout = DEFAULT_TIMEOUT)
+        {
+            return ExecuteSyncInternal(command, options, timeout, true);
+        }
+        
+        public virtual GitCommandResult TryExecute(IGitCommand command, string options = "", int timeout = DEFAULT_TIMEOUT)
+        {
+            return ExecuteSyncInternal(command, options, timeout, false);
+        }
+        
         private static void ValidatePathspec(string[] pathspec)
         {
             // If no pathspec was set at all, everything is fine
@@ -187,6 +149,59 @@ namespace Octothorpe.UGity.Client
             }
 
             throw new GitEmptyPathspecException($"Pathspec was provided, but it was empty!");
+        }
+
+        private GitCommandResult ExecuteSyncInternal(IGitCommand command, string options, int timeout, bool throwExceptions)
+        {
+            Process process = StartCommandProcess(command, options);
+            
+            string output = process.StandardOutput.ReadToEnd();
+            string error = process.StandardError.ReadToEnd();
+
+            if(process.WaitForExit(timeout))
+            {
+                return GetCompletedResult(command, process.ExitCode, output, error, throwExceptions);
+            }
+            else
+            {
+                process.Kill();
+                return GetTimedOutResult(command, throwExceptions);
+            }
+        }
+
+        private GitCommandResult GetCompletedResult(IGitCommand command, int exitCode, string output, string error, bool throwExceptions)
+        {
+            GitCommandResult result = command.ParseResult(exitCode, output.TrimEnd(), error.TrimEnd());
+            this.OnCommandResult?.Invoke(command, true, result);
+
+            if(exitCode == 128)
+                return (throwExceptions) ? throw new GitFatalErrorException(error) : (GitCommandResult) null;
+
+            return result;
+        }
+
+        private GitCommandResult GetTimedOutResult(IGitCommand command, bool throwExceptions)
+        {
+            this.OnCommandResult?.Invoke(command, false, null);
+            return throwExceptions ? throw new GitCommandTimeoutException(command) : (GitCommandResult) null;
+        }
+
+        private Process StartCommandProcess(IGitCommand command, string options)
+        {
+            // Validate the paths provided to ensure that commands intended to target a specific path do not accidentally run with no path
+            ValidatePathspec(command.Pathspec);
+
+            this.builder.Clear();
+
+            if(!string.IsNullOrWhiteSpace(options))
+                this.builder.Append(options.Trim()).Append(" ");
+
+            command.ToString(this.builder);
+
+            this.processInfo.Arguments = this.builder.ToString();
+            this.OnCommandExecute?.Invoke(options, command);
+
+            return Process.Start(this.processInfo);
         }
     }
 }
