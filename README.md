@@ -24,6 +24,8 @@ Not sure how? Follow [these instructions](https://docs.unity3d.com/2020.2/Docume
     - Commit changes
     - Choose files to include or exclude in a commit
     - Amend the last commit
+- Tagging:
+    - Add tag post-commit
 - Pushing:
     - Push to the upstream branch
     - Push to a different remote or remote branch
@@ -50,6 +52,9 @@ Not sure how? Follow [these instructions](https://docs.unity3d.com/2020.2/Docume
 ### Git Menu
 ![UGity - Git Menu](https://user-images.githubusercontent.com/6188803/171821112-41bad790-76cc-44d8-908c-82e5a6db1f2e.png)
 
+### Branch Menu (Located on the status bar)
+![UGity - Branch Menu](https://user-images.githubusercontent.com/6188803/171977229-0f8f86c5-d593-4906-bb7f-dc90c8fc5e02.png)
+
 ### Commit Window
 ![UGity - Commit Window](https://user-images.githubusercontent.com/6188803/171821132-60c9d437-9583-4f01-8e3b-a568f5876b76.png)
 
@@ -73,3 +78,10 @@ Not sure how? Follow [these instructions](https://docs.unity3d.com/2020.2/Docume
 
 ## Known Issues
 See [open issues](https://github.com/wiizerdofwiierd/UGity/issues?q=label%3Abug)
+
+___
+
+## Want to support my work? ❤
+If you like what I've made, please consider supporting me on Ko-fi!  
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/A0A64F1MC)
