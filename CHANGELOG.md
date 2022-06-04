@@ -3,6 +3,7 @@
 ### Fixed
 - Fixed(?) issue with "UGity - This should never be visible" windows appearing after re-compile `(#7)`
 - Fixed issue where commit message box would lose focus; tidied up visuals `(#8)`
+- Fixed issue where errors in the Git Console were not displayed in the proper style `(#6)`
 
 ### Added
 - Added background tasks with progress bars for pushing and pulling `(#11)`
@@ -19,6 +20,7 @@
 - `GitPushWindow`: Implemented async push function with progress bar
 - `IGitClient`: Added delegates used by `GitClient` in this file at the namespace level
 - `IGitClient`: Added events from `GitClient` to the base interface
+- `GitConsoleWindow`: Added distinct text styles for user input, info, and error entries
 
 ### Changed
 - `IGitClient`: Improved documentation
@@ -26,6 +28,8 @@
 - `GitConsoleWindow`: Updated `LogCommandOutput` to match new delegate parameters
 - `GitCommandTimeoutExeption` -> `GitCommandTimeoutException`
 - `GitEditorStyles`: Changed placeholder style as to not conflict as much on top of a text area
+- `GitConsoleWindow`: Moved leftover GUI properties to the correct partial class
+- `GitConsoleWindow`: Updated `OnFirstInitialize()` to construct styles via the chaining customization extensions
 
 ### Removed
 - `GitClient`: Removed delegates from the file

@@ -17,13 +17,6 @@ namespace Octothorpe.UGity.Editor.UI
 
         protected override Type[] DockNextTo => DockNextToTypes;
 
-        private static GUIStyle InfoText { get; set; }
-        private static GUIStyle ErrorText { get; set; }
-        private static GUIStyle EvenRowStyle { get; set; }
-        private static GUIStyle OddRowStyle { get; set; }
-        private static GUIStyle InputPrefix { get; set; }
-        private static GUIStyle InputStyle { get; set; }
-
         private Entry.DisplayFlags Filter
         {
             get => this.displayFlags;

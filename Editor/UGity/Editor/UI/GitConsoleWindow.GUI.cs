@@ -16,6 +16,14 @@ namespace Octothorpe.UGity.Editor.UI
         protected override Texture Icon => GitEditorStyles.GitIcon;
         protected override bool HasHeader { get; } = false;
 
+        private static GUIStyle InfoText { get; set; }
+        private static GUIStyle InputText { get; set; }
+        private static GUIStyle ErrorText { get; set; }
+        private static GUIStyle EvenRowStyle { get; set; }
+        private static GUIStyle OddRowStyle { get; set; }
+        private static GUIStyle InputPrefix { get; set; }
+        private static GUIStyle InputStyle { get; set; }
+        
         private Rect windowRect;
         private Rect toolbarRect;
         private Rect inputRect;
@@ -26,6 +34,51 @@ namespace Octothorpe.UGity.Editor.UI
         private int selectEnd;
         private bool isMaxScroll;
         private bool resetInput;
+
+        // Initializes all of the UI elements and styles. TODO: Clean this up
+        protected override void OnFirstInitialize()
+        {
+            git = new GitClient(Application.dataPath);
+
+            InfoText = EditorStyles.label.Customize()
+                .WithFont(GitEditorStyles.FontMonospaced)
+                .WithTextColor(GUIState.Normal, Color.white)
+                .WithFontSize(0)
+                .WithRichText(true)
+                .WithPadding(4, 4, 0, 0);
+
+            InputText = EditorStyles.label.Customize()
+                .WithFont(GitEditorStyles.FontMonospaced)
+                .WithFontSize(0)
+                .WithRichText(true)
+                .WithPadding(4, 4, 0, 0);
+
+            ErrorText = EditorStyles.label.Customize()
+                .WithFont(GitEditorStyles.FontMonospaced)
+                .WithTextColor(GUIState.Normal, new Color(1.0f, 0.2f, 0.2f, 1.0f))
+                .WithFontSize(0)
+                .WithRichText(true)
+                .WithPadding(4, 4, 0, 0);
+
+            EvenRowStyle = new GUIStyle("CN EntryBackEven").WithFont(GitEditorStyles.FontMonospaced);
+            OddRowStyle = new GUIStyle("CN EntryBackOdd").WithFont(GitEditorStyles.FontMonospaced);
+
+            InputPrefix = EditorStyles.label.Customize()
+                .WithFont(GitEditorStyles.FontMonospaced)
+                .WithFontSize(16)
+                .WithPadding(4, 0, 0, 0)
+                .WithAlignment(TextAnchor.MiddleLeft);
+
+            int caretWidth = (int) InputPrefix.CalcSize(new GUIContent(CARET)).x;
+            InputPrefix.WithFixedWidth(caretWidth);
+
+            InputStyle = EditorStyles.textField.Customize()
+                .WithFont(GitEditorStyles.FontMonospaced)
+                .WithFontSize(16);
+
+            RectOffset padding = InputStyle.padding;
+            InputStyle.WithPadding(caretWidth, padding.right, padding.top, padding.bottom).WithAlignment(TextAnchor.MiddleLeft);
+        }
         
         protected override void OnDraw()
         {
@@ -43,6 +96,16 @@ namespace Octothorpe.UGity.Editor.UI
             DrawInput(eventType, this.inputRect);
         }
 
+        private GUIStyle GetForegroundStyle(Entry entry)
+        {
+            if(entry.Type == Entry.EntryType.Input)
+                return InputText;
+            else if(entry.Type == Entry.EntryType.Error)
+                return ErrorText;
+            else
+                return InfoText;
+        }
+        
         private void DrawToolbar(EventType eventType, Rect rect)
         {
             if(eventType == EventType.Repaint)
@@ -122,12 +185,12 @@ namespace Octothorpe.UGity.Editor.UI
                         int i = RowToEntryIndex(row);
 
                         GUIContent content = new GUIContent(entries[i].Text);
-                        //Entry result = entries[i]; // TODO: Allow viewing of details within the log window
+                        Entry entry = entries[i]; // TODO: Allow viewing of details within the log window
 
                         GUIStyle background = i % 2 == 0 ? EvenRowStyle : OddRowStyle;
                         background.Draw(rowRect, GUIContent.none, 0, row >= this.selectStart && row <= this.selectEnd);
 
-                        GUIStyle foreground = InfoText;
+                        GUIStyle foreground = GetForegroundStyle(entry);
                         rowRect.height = foreground.CalcSize(content).y;
                         foreground.Draw(rowRect, content, 0);
                     }
@@ -226,45 +289,6 @@ namespace Octothorpe.UGity.Editor.UI
                 EditorGUI.FocusTextInControl(null);
                 this.resetInput = true;
             }
-        }
-
-        // Initializes all of the UI elements and styles. TODO: Clean this up
-        protected override void OnFirstInitialize()
-        {
-            git = new GitClient(Application.dataPath);
-
-            InfoText = new GUIStyle(EditorStyles.label);
-            InfoText.font = GitEditorStyles.FontMonospaced;
-            InfoText.fontSize = 0;
-            InfoText.richText = true;
-            InfoText.padding = new RectOffset(4, 4, 0, 0);
-
-            ErrorText = new GUIStyle(EditorStyles.label);
-            ErrorText.font = GitEditorStyles.FontMonospaced;
-            ErrorText.fontSize = 0;
-            ErrorText.richText = true;
-            ErrorText.padding = new RectOffset(4, 4, 0, 0);
-
-            EvenRowStyle = "CN EntryBackEven";
-            EvenRowStyle.font = GitEditorStyles.FontMonospaced;
-            OddRowStyle = "CN EntryBackOdd";
-            OddRowStyle.font = GitEditorStyles.FontMonospaced;
-
-            InputPrefix = new GUIStyle(EditorStyles.label);
-            InputPrefix.font = GitEditorStyles.FontMonospaced;
-            InputPrefix.fontSize = 16;
-            float caretWidth = InputPrefix.CalcSize(new GUIContent(CARET)).x;
-            InputPrefix.fixedWidth = caretWidth;
-            InputPrefix.alignment = TextAnchor.MiddleLeft;
-            InputPrefix.padding = new RectOffset(4, 0, 0, 0);
-
-            InputStyle = new GUIStyle(EditorStyles.textField);
-            InputStyle.font = GitEditorStyles.FontMonospaced;
-            InputStyle.fontSize = 16;
-            RectOffset padding = InputStyle.padding;
-            padding.left = (int) caretWidth;
-            InputStyle.padding = padding;
-            InputStyle.alignment = TextAnchor.MiddleLeft;
         }
     }
 }
