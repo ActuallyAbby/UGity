@@ -106,8 +106,8 @@ namespace Octothorpe.UGity.Editor.UI
             this.commits = new List<CommitInfo>(GetUnpushedCommits());
             if(this.commits.Count == 0)
             {
-                //this.Close();
-                //EditorUtility.DisplayDialog("No Changes", "There are no changes to push.", "Close");
+                this.Close();
+                EditorUtility.DisplayDialog("No Changes", "There are no changes to push.", "Close");
             }
 
             this.remotes = Client.GetRemotes();
