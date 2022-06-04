@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 
+using Octothorpe.Ugity.Editor.Util;
+
 namespace Octothorpe.UGity.Client
 {
     public class GitCommand : GitCommand<GitCommand, GitCommandResult>
@@ -171,6 +173,8 @@ namespace Octothorpe.UGity.Client
         {
             if(!this.options.ContainsKey(arg))
                 this.options.Add(arg, new List<string>());
+
+            value = value?.ToString().Enquote(true);
 
             this.options[arg].Add(value?.ToString());
         }

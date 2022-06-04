@@ -21,6 +21,7 @@
 - `IGitClient`: Added delegates used by `GitClient` in this file at the namespace level
 - `IGitClient`: Added events from `GitClient` to the base interface
 - `GitConsoleWindow`: Added distinct text styles for user input, info, and error entries
+- `StringExtensions`: Added `Enquote()`
 
 ### Changed
 - `IGitClient`: Improved documentation
@@ -30,6 +31,7 @@
 - `GitEditorStyles`: Changed placeholder style as to not conflict as much on top of a text area
 - `GitConsoleWindow`: Moved leftover GUI properties to the correct partial class
 - `GitConsoleWindow`: Updated `OnFirstInitialize()` to construct styles via the chaining customization extensions
+- `GitCommand`:  Default `WithOption` behaviour now automatically enquotes values containing a whitespace character
 
 ### Removed
 - `GitClient`: Removed delegates from the file
