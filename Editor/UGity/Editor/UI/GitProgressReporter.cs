@@ -64,7 +64,7 @@ namespace Octothorpe.UGity.Editor.UI
             float completedStages = this.stage - 1;
             float totalPct = (completedStages * (1f / this.maxStages)) + (stagePct * (1f / this.maxStages));
 
-            Progress.Report(this.taskId, totalPct);
+            Progress.Report(this.taskId, totalPct, line);
         }
     }
 }
