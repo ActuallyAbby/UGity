@@ -56,18 +56,8 @@ namespace Octothorpe.UGity.Editor.UI
 
         protected void OnLostFocus() => this.lostFocus = true;
 
-        protected virtual void OnOpen() { }
-
-        protected virtual void OnFirstInitialize() { }
-
-        protected virtual void OnPostInitialize() { }
-
-        protected virtual void OnUninitialize() { }
-
-        protected virtual void OnRefocus() { }
-
         public static TSelf Open(bool centered = true)
-        {   
+        {
             TSelf window;
             Type[] dockNextTo = Static<TSelf>.Instance.DockNextTo;
 
@@ -84,6 +74,16 @@ namespace Octothorpe.UGity.Editor.UI
         }
 
         public static void OpenModal<T>(bool centered = true) where T : Modal => CreateInstance<T>().ShowModalUtility();
+
+        protected virtual void OnOpen() { }
+        
+        protected virtual void OnFirstInitialize() { }
+
+        protected virtual void OnPostInitialize() { }
+        
+        protected virtual void OnUninitialize() { }
+
+        protected virtual void OnRefocus() { }
     }
 
     /// <summary>
