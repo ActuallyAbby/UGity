@@ -9,5 +9,6 @@
         public static GitCommand Rebase => new GitCommand("rebase");
         public static GitCommand Reset => new GitCommand("reset");
         public static GitCommand Restore => new GitCommand("restore");
+        public static GitCommand Tag => new GitCommand("tag");
     }
 }

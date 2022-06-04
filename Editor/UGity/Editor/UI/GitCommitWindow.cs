@@ -171,6 +171,7 @@ namespace Octothorpe.UGity.Editor.UI
             List<string> addForCommit = new List<string>();
             List<string> resetForCommit = new List<string>();
 
+            // TODO: CLEAN THIS UP
             foreach(GitFile change in Client.Execute(Git.Status))
             {
                 bool isInCommit = included.Contains(change);
@@ -196,21 +197,14 @@ namespace Octothorpe.UGity.Editor.UI
             foreach(string path in resetForCommit)
                 Client.TryExecute(Git.Reset.WithPathspec(path));
 
-            // Execute the commit command and display a success message
             try
             {
                 Client.Execute(command);
-
-                IsAmending = false;
-                CommitMessage = "";
-                
-                this.lastCommitHash = Client.GetHeadHash();
-                EditorUtility.DisplayDialog("Success!", $"{included.Count} file(s) committed\nHEAD is now at {this.lastCommitHash}", "Close");
             }
-            // Display a failure message if execution of the commit command threw an exception
             catch(GitClientException e)
             {
                 EditorUtility.DisplayDialog("Commit Failed", e.Message, "Close");
+                return;
             }
             // Ensure the reset files are always re-added
             finally
@@ -219,7 +213,38 @@ namespace Octothorpe.UGity.Editor.UI
                     Client.TryExecute(Git.Add.WithOption("--ignore-errors").WithPathspec(resetForCommit));
 
                 Refresh();
-            } 
+            }
+
+            IsAmending = false;
+            CommitMessage = "";
+
+            this.lastCommitHash = Client.GetHeadHash();
+            int response = EditorUtility.DisplayDialogComplex("Success!", $"{included.Count} file(s) committed\nHEAD is now at {this.lastCommitHash}", "Continue to Push", "Close", "Add Tag");
+
+            // If 'Close' is not clicked, close the current window. Wait, what?
+            if(response != 1)
+                Close();
+            
+            if(response == 0)
+            {
+                GitPushWindow.Open();
+            }
+            else if(response == 2)
+            {
+                (string tag, string message) = CreatePrompt<(string, string)>($"Tagging {this.lastCommitHash}", out bool cancelled, "Tag", "Message (Optional)");
+                if(cancelled) return;
+                
+                try
+                {
+                    Client.Execute(Git.Tag
+                        .WithOption("-a", tag)
+                        .WithOptionIf(!string.IsNullOrEmpty(message), "-m", message));
+                }
+                catch(GitClientException e)
+                {
+                    EditorUtility.DisplayDialog("Add Tag Failed", e.Message, "Close");
+                }
+            }
         }
 
         private void DrawToolbar(Rect rect)
