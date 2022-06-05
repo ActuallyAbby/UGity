@@ -249,7 +249,7 @@ namespace Octothorpe.UGity.Editor.UI
 
         private void DrawToolbar(Rect rect)
         {
-            const int elements = 5;
+            const int elements = 6;
             float elementWidth = rect.width / elements;
 
             EditorGUI.DrawRect(rect, new Color(0.1f, 0.1f, 0.1f));
@@ -263,6 +263,14 @@ namespace Octothorpe.UGity.Editor.UI
                 Refresh();
             }
 
+            if(Button("file-diff", "Show diff"))
+            {
+                HashSet<string> paths = this.tree.GetSelectedPaths();
+                paths.RemoveWhere(p => p.EndsWith(".meta"));
+                
+                Client.OpenDiffTool(paths);
+            }
+            
             if(Button("file-restore", "Restore Selected to Previous Revision", this.tree.CanRestoreSelected))
                 RestoreWithPrompt();
 

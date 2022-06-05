@@ -8,6 +8,7 @@
 ### Added
 - Added background tasks with progress bars for pushing and pulling `(#11)`
 - Added two additional options to the success prompt post-commit: 'Continue to Push' and 'Add Tag' `(#12)`
+- Added 'Show diff' button to the commit window toolbar `(#3)`
 
 ## Runtime/Backend
 ### Fixed
@@ -26,6 +27,7 @@
 - `Git`: Added `Tag`
 - `GitEditorClient`: Added `OpenDiffTool()` and `OpenMergeTool()`
 - `GitClientExtensions`: Added `GetUnmergedFiles()`
+- `GitCommitWindow`: Added 'Show diff' button to the toolbar
 
 ### Changed
 - `IGitClient`: Improved documentation
