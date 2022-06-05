@@ -25,6 +25,7 @@
 - `StringExtensions`: Added `Enquote()`
 - `Git`: Added `Tag`
 - `GitEditorClient`: Added `OpenDiffTool()` and `OpenMergeTool()`
+- `GitClientExtensions`: Added `GetUnmergedFiles()`
 
 ### Changed
 - `IGitClient`: Improved documentation

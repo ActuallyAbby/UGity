@@ -30,6 +30,15 @@ namespace Octothorpe.UGity.Util
             return branches;
         }
 
+        public static ISet<string> GetUnmergedFiles(this IGitClient client)
+        {
+            GitCommandResult result = client.Execute(new GitCommand("ls-files").WithOption("-u"));
+            ISet<string> set = new HashSet<string>(result.Lines);
+            set.Remove("");
+
+            return set;
+        }
+        
         public static string[] GetBranches(this IGitClient client)
         {
             return client.Execute(Git.Branch.WithOption("--format", "%(refname:short)")).Lines.TrimAll();
@@ -85,7 +94,7 @@ namespace Octothorpe.UGity.Util
         }
 
         public static string GetHeadDisplayName(this IGitClient client) => GetBranchName(client) ?? GetHeadHash(client);
-        
+
         public static string GetUpstream(this IGitClient client, string branch = "")
         {
             return client.TryExecute(new GitCommand("rev-parse")
