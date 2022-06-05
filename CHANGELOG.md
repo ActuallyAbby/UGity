@@ -24,6 +24,7 @@
 - `GitConsoleWindow`: Added distinct text styles for user input, info, and error entries
 - `StringExtensions`: Added `Enquote()`
 - `Git`: Added `Tag`
+- `GitEditorClient`: Added `OpenDiffTool()` and `OpenMergeTool()`
 
 ### Changed
 - `IGitClient`: Improved documentation

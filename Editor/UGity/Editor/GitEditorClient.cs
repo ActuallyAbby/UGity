@@ -7,6 +7,7 @@ using Octothorpe.UGity.Editor.Exceptions;
 using Octothorpe.UGity.Editor.Persistence;
 using Octothorpe.UGity.Editor.UI;
 using Octothorpe.UGity.Editor.Util;
+using Octothorpe.UGity.Util;
 
 using UnityEditor;
 
@@ -197,6 +198,65 @@ namespace Octothorpe.UGity.Editor
             return success;
         }
 
+        public async void OpenDiffTool(IReadOnlyCollection<string> paths, bool confirmMultipleFiles = true)
+        {
+            int count = paths.Count;
+            Log("Opening difftool with {0} file{1}...", count, count == 1 ? "" : "s");
+
+            string difftool = this.GetConfigOption("diff.guitool");
+            if(string.IsNullOrEmpty(difftool))
+                difftool = this.GetConfigOption("merge.guitool");
+            if(string.IsNullOrEmpty(difftool))
+                difftool = this.GetConfigOption("diff.tool");
+            if(string.IsNullOrEmpty(difftool))
+                difftool = this.GetConfigOption("merge.tool");
+            if(string.IsNullOrEmpty(difftool))
+                throw new GitEditorException("No diff tool configured");
+
+            if(paths.Count > 1 && confirmMultipleFiles)
+            {
+                bool confirm = EditorUtility.DisplayDialog("Open Diff Tool", $"Open {paths.Count} files using '{difftool}'?", "Open", "Cancel");
+                if(!confirm) return;
+            }
+
+            try
+            {
+                await ExecuteAsync(new GitCommand("difftool")
+                    .WithOption("--gui")
+                    .WithOption("-y")
+                    .WithArgument("HEAD")
+                    .WithPathspec(paths), timeout: 5000);
+            }
+            catch(GitCommandTimeoutException) { }
+        }
+
+        public async void OpenMergeTool(IReadOnlyCollection<string> paths, bool confirmMultipleFiles = true)
+        {
+            int count = paths.Count;
+            Log("Opening mergetool with {0} file{1}...", count, count == 1 ? "" : "s");
+
+            string mergetool = this.GetConfigOption("merge.guitool");
+            if(string.IsNullOrEmpty(mergetool))
+                mergetool = this.GetConfigOption("merge.tool");
+            if(string.IsNullOrEmpty(mergetool))
+                throw new GitEditorException("No merge tool configured");
+
+            if(paths.Count > 1 && confirmMultipleFiles)
+            {
+                bool confirm = EditorUtility.DisplayDialog("Open Merge Tool", $"Open {paths.Count} files using '{mergetool}'?", "Open", "Cancel");
+                if(!confirm) return;
+            }
+
+            try
+            {
+                await ExecuteAsync(new GitCommand("mergetool")
+                    .WithOption("--gui")
+                    .WithOption("-y")
+                    .WithPathspec(paths), timeout: 5000);
+            }
+            catch(GitCommandTimeoutException) { }
+        }
+        
         public void InitRepository()
         {
             Execute(new GitCommand("init"));
