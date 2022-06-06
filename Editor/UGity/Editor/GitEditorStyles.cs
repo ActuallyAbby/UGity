@@ -67,17 +67,17 @@ namespace Octothorpe.UGity.Editor
             .WithMargin(8, 8, 8, 8)
             .WithPadding(4, 4, 4, 4)
             .WithFixedHeight(32f));
-        
+
         private static readonly Lazy<GUIStyle> monospacedLabel = new Lazy<GUIStyle>(() => GUI.skin.label.Customize()
             .WithFont(FontMonospaced)
             .WithAlignment(TextAnchor.MiddleCenter));
-
+        
         private static readonly Lazy<GUIStyle> placeholder = new Lazy<GUIStyle>(() => EditorStyles.textArea.Customize()
             .WithBackground(GUIState.Normal, null)
             .WithPadding(2, 2, 2, 2)
             .WithAlignment(TextAnchor.UpperLeft));
-        
-        private static readonly Lazy<GUIStyle> label = new Lazy<GUIStyle>(() => GUI.skin.label.Customize().WithRichText(true));
+
+        private static readonly Lazy<GUIStyle> label = new Lazy<GUIStyle>(() => EditorStyles.label.Customize().WithRichText(true));
 
         private static readonly Lazy<GUIStyle> statusBarButton = new Lazy<GUIStyle>(() => new GUIStyle("ToolbarDropDownLeft").Customize()
             .WithMargin(0, 0, 0, 0)

@@ -6,6 +6,7 @@
 ## Runtime/Backend
 ### Changed
 - `GitEditorStyles`: Reorganized members and added some new icons
+- `GitEditorStyles`: Change `Label` to be based off of `EditorStyles.label` rather than `GUI.skin.label`
 - `GitCommitWindow`: Rewrote `DrawToolbar()` to use standard IMGUI and cached icons
 
 # [0.8.0] - 2022-06-05
