@@ -1,7 +1,12 @@
 # [Unreleased]
+## Editor
+### Changed
+- Cleaned up the commit window toolbar
+
 ## Runtime/Backend
 ### Changed
 - `GitEditorStyles`: Reorganized members and added some new icons
+- `GitCommitWindow`: Rewrote `DrawToolbar()` to use standard IMGUI and cached icons
 
 # [0.8.0] - 2022-06-05
 ## Editor

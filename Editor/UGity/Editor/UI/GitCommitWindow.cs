@@ -48,6 +48,14 @@ namespace Octothorpe.UGity.Editor.UI
             }
         }
 
+        private static GUIContent toolbarRefresh;
+        private static GUIContent toolbarRemove;
+        private static GUIContent toolbarDiff;
+        private static GUIContent toolbarRestore;
+        private static GUIContent toolbarAdd;
+        private static GUIContent toolbarModeToFlattened;
+        private static GUIContent toolbarModeToHierarchy;
+        
         [SerializeField]
         private string amendMessage;
 
@@ -63,6 +71,17 @@ namespace Octothorpe.UGity.Editor.UI
 
         protected override void OnOpen() => minSize = new Vector2(250f, 0f);
 
+        protected override void OnFirstInitialize()
+        {
+            toolbarRefresh = new GUIContent(GitEditorStyles.RefreshIcon, "Refresh");
+            toolbarRemove = new GUIContent(GitEditorStyles.RemoveIcon, "Un-stage");
+            toolbarDiff = new GUIContent(GitEditorStyles.DiffIcon, "Show Diff");
+            toolbarRestore = new GUIContent(GitEditorStyles.RestoreIcon, "Restore");
+            toolbarAdd = new GUIContent(GitEditorStyles.AddIcon, "Stage");
+            toolbarModeToFlattened = new GUIContent(GitEditorStyles.HierarchyIcon, "Click to display flattened view");
+            toolbarModeToHierarchy = new GUIContent(GitEditorStyles.HierarchyIcon, "Click to display hierarchal view");
+        }
+        
         protected override void OnInitialize()
         {
             this.state = Client.State.LoadSubState<GitCommitState>();
@@ -103,7 +122,7 @@ namespace Octothorpe.UGity.Editor.UI
             GUIContent commitText = new GUIContent(GetCommitButtonText());
 
             // Draw the toolbar
-            DrawToolbar(EditorGUILayout.GetControlRect(false, 24f));
+            DrawToolbar();
 
             // Draw the tree & search
             DrawTree();
@@ -247,60 +266,53 @@ namespace Octothorpe.UGity.Editor.UI
             }
         }
 
-        private void DrawToolbar(Rect rect)
+        private void DrawToolbar()
         {
-            const int elements = 6;
-            float elementWidth = rect.width / elements;
-
-            EditorGUI.DrawRect(rect, new Color(0.1f, 0.1f, 0.1f));
-
-            if(Button("TreeEditor.Refresh", "Refresh"))
-                Refresh();
-
-            if(Button("Toolbar Minus", "Un-stage Selected", this.tree.CanRemoveSelected))
+            GUIContent[] toolbarContent = new GUIContent[]
             {
-                Client.RemoveFiles(this.tree.GetSelectedPaths(), true);
-                Refresh();
-            }
-
-            if(Button("file-diff", "Show diff", this.tree.CanDiffSelected))
-            {
-                HashSet<string> paths = this.tree.GetSelectedPaths();
-                paths.RemoveWhere(p => p.EndsWith(".meta"));
-                
-                Client.OpenDiffTool(paths);
-            }
+                toolbarRefresh,
+                toolbarRemove,
+                toolbarDiff,
+                toolbarRestore,
+                toolbarAdd,
+                this.tree.ShowHierarchy ? toolbarModeToFlattened : toolbarModeToHierarchy,
+            };
             
-            if(Button("file-restore", "Restore Selected to Previous Revision", this.tree.CanRestoreSelected))
-                RestoreWithPrompt();
-
-            if(Button("Toolbar Plus", "Stage Selected", this.tree.CanAddSelected))
+            bool[] toolbarStates = new bool[]
             {
-                Client.AddFiles(this.tree.GetSelectedPaths());
-                Refresh();
-            }
+                true,
+                this.tree.CanRemoveSelected,
+                this.tree.CanDiffSelected,
+                this.tree.CanRestoreSelected,
+                this.tree.CanAddSelected,
+                true,
+            };
 
-            bool showHierarchy = this.tree.ShowHierarchy;
-            string hierarchyTooltip = "Click to display " + (showHierarchy ? "flattened" : "hierarchal") + " view";
-
-            this.tree.ShowHierarchy = Button("UnityEditor.HierarchyWindow", hierarchyTooltip, isToggled: this.tree.ShowHierarchy);
-
-            bool Button(string iconName, string tooltip, bool? enableCondition = null, bool? isToggled = null)
+            int clickedButton = GUILayout.Toolbar(-1, toolbarContent, toolbarStates, EditorStyles.toolbarButton);
+            switch(clickedButton)
             {
-                Rect buttonRect = EditorUtil.CutRect(ref rect, elementWidth);
-
-                Texture icon = EditorUtil.LoadIcon(iconName + ".png");
-                if(icon == null)
-                    icon = EditorGUIUtility.IconContent(iconName).image;
-
-                GUIContent content = new GUIContent(icon, tooltip);
-
-                using(new EditorGUI.DisabledScope(enableCondition is false))
-                {
-                    return isToggled is null
-                        ? GUI.Button(buttonRect, content, EditorStyles.toolbarButton)
-                        : GUI.Toggle(buttonRect, isToggled.Value, content, EditorStyles.toolbarButton);
-                }  
+                case 0:
+                    Refresh();
+                    break;
+                case 1:
+                    Client.RemoveFiles(this.tree.GetSelectedPaths(), true);
+                    Refresh();
+                    break;
+                case 2:
+                    HashSet<string> paths = this.tree.GetSelectedPaths();
+                    paths.RemoveWhere(p => p.EndsWith(".meta"));
+                    Client.OpenDiffTool(paths);
+                    break;
+                case 3:
+                    RestoreWithPrompt();
+                    break;
+                case 4:
+                    Client.AddFiles(this.tree.GetSelectedPaths());
+                    Refresh();
+                    break;
+                case 5:
+                    this.tree.ShowHierarchy = !this.tree.ShowHierarchy;
+                    break;
             }
         }
 
