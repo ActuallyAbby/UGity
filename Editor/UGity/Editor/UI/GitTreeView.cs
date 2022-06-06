@@ -32,6 +32,7 @@ namespace Octothorpe.UGity.Editor.UI
         public bool CanAddSelected { get; private set; }
         public bool CanRestoreSelected { get; private set; }
         public bool CanRemoveSelected { get; private set; }
+        public bool CanDiffSelected { get; private set; }
 
         private TreeViewItem root;
         private GitTreeItem trackedRoot;
@@ -90,6 +91,7 @@ namespace Octothorpe.UGity.Editor.UI
             CanAddSelected = false;
             CanRestoreSelected = true;
             CanRemoveSelected = false;
+            CanDiffSelected = (selectedIds.Count > 0);
 
             if(selectedIds.Count == 0)
                 return;
@@ -98,6 +100,10 @@ namespace Octothorpe.UGity.Editor.UI
             {
                 if(FindItem(id) is GitTreeItem item)
                 {
+                    // If a file is untracked (or not modified), disable restore
+                    if(item.File.IsUntracked || !GitStateFlags.Modified.HasFlag(item.File.StateFlags))
+                        CanDiffSelected = false;
+
                     // If a file is untracked (and not modified in the index), disable restore
                     if(item.File.IsUntracked && item.File.StateInIndex == GitState.Unmodified)
                         CanRestoreSelected = false;

@@ -263,7 +263,7 @@ namespace Octothorpe.UGity.Editor.UI
                 Refresh();
             }
 
-            if(Button("file-diff", "Show diff"))
+            if(Button("file-diff", "Show diff", this.tree.CanDiffSelected))
             {
                 HashSet<string> paths = this.tree.GetSelectedPaths();
                 paths.RemoveWhere(p => p.EndsWith(".meta"));

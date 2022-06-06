@@ -28,6 +28,7 @@
 - `GitEditorClient`: Added `OpenDiffTool()` and `OpenMergeTool()`
 - `GitClientExtensions`: Added `GetUnmergedFiles()`
 - `GitCommitWindow`: Added 'Show diff' button to the toolbar
+- `GitTreeView`: Added check to `SelectionChanged()` to determine if diff is applicable to the selected
 
 ### Changed
 - `IGitClient`: Improved documentation
