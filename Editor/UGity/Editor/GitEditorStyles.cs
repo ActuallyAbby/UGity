@@ -19,7 +19,8 @@ namespace Octothorpe.UGity.Editor
         public static readonly Texture2D PushWindowIcon = EditorUtil.LoadIcon("arrow-top-right.png");
         public static readonly Texture2D PullWindowIcon = EditorUtil.LoadIcon("arrow-bottom-left.png");
         public static readonly Texture2D CommitIcon = EditorUtil.LoadIcon("git-commit-vertical.png");
-        public static readonly Texture2D BranchIcon = EditorUtil.LoadIcon("git-branch.png"); 
+        public static readonly Texture2D BranchIcon = EditorUtil.LoadIcon("git-branch.png");
+        public static readonly Texture2D CompareIcon = EditorUtil.LoadIcon("git-compare.png");
         public static readonly Texture2D GitIcon = EditorUtil.LoadIcon("git-color.png");
 
         //public static readonly GUISkin Skin = EditorUtil.LoadSkin("UGity Default");
