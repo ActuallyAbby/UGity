@@ -5,6 +5,8 @@
 
 ## Runtime/Backend
 ### Added
+- Added `GitMergeWindow`
+- `GitCommitWindow`: Added warning for unresolved merge conflicts; blocks committing and prompts to resolve conflicts
 - `EditorUtil`: Added parameter to `DrawLabelTruncated()` to provide a `GUIStyle`
 
 ### Changed
@@ -12,6 +14,10 @@
 - `GitCommitWindow`: Rewrote `DrawToolbar()` to use standard IMGUI and cached icons
 - `EditorUtil`: Changed `GetLabelStyle()` to use `GitEditorStyles.Label` as a base
 - `GitTreeView`: Updated `DrawRow()` to provide a style to `EditorUtil.DrawLabelTruncated()`
+- `GitEditorClient`: Added overload for `OpenMergeTool()` with `params string[]` parameter
+
+### Removed
+- `GitTreeView`: Removed merge conflict warning next to filename label
 
 # [0.8.0] - 2022-06-05
 ## Editor

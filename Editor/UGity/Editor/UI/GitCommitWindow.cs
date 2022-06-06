@@ -66,6 +66,7 @@ namespace Octothorpe.UGity.Editor.UI
         private string lastCommitHash;
         private string lastCommitMessage;
         private string branchName;
+        private bool hasMergeConflicts;
 
         private GUIContent amendLabel;
 
@@ -131,7 +132,18 @@ namespace Octothorpe.UGity.Editor.UI
             bool canAmend = (this.lastCommitHash != null);
 
             if(!canCommit)
+            {
                 EditorGUILayout.HelpBox(warning, MessageType.Warning, true);
+
+                if(this.hasMergeConflicts)
+                {
+                    Rect helpBoxRect = GUILayoutUtility.GetLastRect();
+                    helpBoxRect = helpBoxRect.Inset((int) helpBoxRect.width - 100, 8, 8, 8);
+
+                    if(GUI.Button(helpBoxRect, new GUIContent("Resolve")))
+                        GitMergeWindow.Open();
+                }
+            }
             else
                 GUILayout.Label(warning, GUIStyle.none, GUILayout.Width(0f), GUILayout.Height(0f));
             
@@ -157,14 +169,20 @@ namespace Octothorpe.UGity.Editor.UI
 
         private bool CanCommit(out string failureMessage)
         {
+            // Can't commit with unmerged files
+            if(this.hasMergeConflicts)
+            {
+                failureMessage = "There are unresolved merge conflict(s)";
+                return false;
+            }
             // Can't commit with an empty message
-            if(string.IsNullOrWhiteSpace(CommitMessage))
+            else if(string.IsNullOrWhiteSpace(CommitMessage))
             {
                 failureMessage = "Please enter a commit message";
                 return false;
             }
             // Can't commit if amending and nothing has been changed
-            if(this.tree.GetIncludedPaths().Count == 0)
+            else if(this.tree.GetIncludedPaths().Count == 0)
             {
                 if(!IsAmending || CommitMessage == this.lastCommitMessage)
                 {
@@ -360,6 +378,7 @@ namespace Octothorpe.UGity.Editor.UI
             GitStatusResult status = Client.Execute(Git.Status.WithOption("--untracked-files"));
 
             this.branchName = status.BranchName ?? this.lastCommitHash;
+            this.hasMergeConflicts = Client.GetUnmergedFiles().Count > 0;
             this.tree.Populate(status);
         }
 

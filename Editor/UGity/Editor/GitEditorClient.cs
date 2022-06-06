@@ -230,6 +230,8 @@ namespace Octothorpe.UGity.Editor
             catch(GitCommandTimeoutException) { }
         }
 
+        public void OpenMergeTool(params string[] paths) => OpenMergeTool(new List<string>(paths));
+
         public async void OpenMergeTool(IReadOnlyCollection<string> paths, bool confirmMultipleFiles = true)
         {
             int count = paths.Count;

@@ -363,7 +363,6 @@ namespace Octothorpe.UGity.Editor.UI
 
             GUIContent fileLabel = new GUIContent(item.displayName);
             // TODO: Initialize these at construction instead
-            GUIContent conflictLabel = CreateIconContent("console.erroricon", null, "This file has unresolved merge conflict(s)");
             GUIContent warningLabel = CreateIconContent("console.warnicon", null,
                 "This file has changes staged for commit but has been deleted locally. Use the rollback button to discard this file");
 
