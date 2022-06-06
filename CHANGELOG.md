@@ -4,7 +4,6 @@ No unreleased changes
 # [0.8.0] - 2022-06-05
 ## Editor
 ### Fixed
-- Fixed(?) issue with "UGity - This should never be visible" windows appearing after re-compile `(#7)`
 - Fixed issue where commit message box would lose focus; tidied up visuals `(#8)`
 - Fixed issue where errors in the Git Console were not displayed in the proper style `(#6)`
 
