@@ -1,5 +1,7 @@
 # [Unreleased]
-No unreleased changes
+## Runtime/Backend
+### Changed
+- `GitEditorStyles`: Reorganized members and added some new icons
 
 # [0.8.0] - 2022-06-05
 ## Editor

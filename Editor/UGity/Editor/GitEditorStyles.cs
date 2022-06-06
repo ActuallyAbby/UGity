@@ -11,26 +11,17 @@ namespace Octothorpe.UGity.Editor
 {
     public static class GitEditorStyles
     {
-        public const float BUTTON_HEIGHT = 42f;
-        
-        public static readonly Font FontMonospaced = EditorUtil.LoadFont("Inconsolata-Regular.ttf");
-
         public static readonly Texture2D CommitWindowIcon = EditorUtil.LoadIcon("check-bold-color.png");
         public static readonly Texture2D PushWindowIcon = EditorUtil.LoadIcon("arrow-top-right.png");
         public static readonly Texture2D PullWindowIcon = EditorUtil.LoadIcon("arrow-bottom-left.png");
         public static readonly Texture2D CommitIcon = EditorUtil.LoadIcon("git-commit-vertical.png");
         public static readonly Texture2D BranchIcon = EditorUtil.LoadIcon("git-branch.png");
+        public static readonly Texture2D RestoreIcon = EditorUtil.LoadIcon("file-restore.png");
+        public static readonly Texture2D DiffIcon = EditorUtil.LoadIcon("file-diff.png");
         public static readonly Texture2D CompareIcon = EditorUtil.LoadIcon("git-compare.png");
         public static readonly Texture2D GitIcon = EditorUtil.LoadIcon("git-color.png");
-
-        //public static readonly GUISkin Skin = EditorUtil.LoadSkin("UGity Default");
-
-        public static Color ColorUntracked => new Color(0.8f, 0.5f, 0.5f);
-        public static Color ColorAdded => new Color(0.5f, 0.8f, 0.5f);
-        public static Color ColorModified => new Color(0.5f, 0.6f, 1.0f);
-        public static Color ColorDeleted => new Color(0.5f, 0.5f, 0.5f);
-        public static Color ColorUnmerged => new Color(1.0f, 0.8f, 0.4f);
-        public static Color ColorDefault => new Color(1.0f, 1.0f, 1.0f);
+        
+        public static readonly Font FontMonospaced = EditorUtil.LoadFont("Inconsolata-Regular.ttf");
 
         public static GUIStyle ConfirmButton => confirmButton.Value;
         public static GUIStyle CommitSummaryItem => commitSummaryItem.Value;
@@ -44,6 +35,23 @@ namespace Octothorpe.UGity.Editor
         public static GUIStyle Toggle => toggle.Value;
         public static GUIStyle WarningBox => warningBox.Value;
 
+        public static Texture2D RefreshIcon => refreshIcon.Value;
+        public static Texture2D RemoveIcon => removeIcon.Value;
+        public static Texture2D AddIcon => addIcon.Value;
+        public static Texture2D HierarchyIcon => hierarchyIcon.Value;
+
+        public static Color ColorUntracked => new Color(0.8f, 0.5f, 0.5f);
+        public static Color ColorAdded => new Color(0.5f, 0.8f, 0.5f);
+        public static Color ColorModified => new Color(0.5f, 0.6f, 1.0f);
+        public static Color ColorDeleted => new Color(0.5f, 0.5f, 0.5f);
+        public static Color ColorUnmerged => new Color(1.0f, 0.8f, 0.4f);
+        public static Color ColorDefault => new Color(1.0f, 1.0f, 1.0f);
+
+        private static readonly Lazy<Texture2D> refreshIcon = LazyIconContent("TreeEditor.Refresh");
+        private static readonly Lazy<Texture2D> removeIcon = LazyIconContent("Toolbar Minus");
+        private static readonly Lazy<Texture2D> addIcon = LazyIconContent("Toolbar Plus");
+        private static readonly Lazy<Texture2D> hierarchyIcon = LazyIconContent("UnityEditor.HierarchyWindow");
+        
         private static readonly Lazy<GUIStyle> confirmButton = new Lazy<GUIStyle>(() => GUI.skin.button.Customize().WithMargin(8, 8, 8, 8).WithFixedHeight(32f));
 
         private static readonly Lazy<GUIStyle> commitSummaryItem = new Lazy<GUIStyle>(() => GUI.skin.label.Customize()
@@ -114,5 +122,7 @@ namespace Octothorpe.UGity.Editor
             else
                 return ColorDefault;
         }
+
+        private static Lazy<Texture2D> LazyIconContent(string name) => new Lazy<Texture2D>(() => EditorGUIUtility.IconContent(name).image as Texture2D);
     }
 }
