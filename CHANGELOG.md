@@ -4,9 +4,14 @@
 - Cleaned up the commit window toolbar
 
 ## Runtime/Backend
+### Added
+- `EditorUtil`: Added parameter to `DrawLabelTruncated()` to provide a `GUIStyle`
+
 ### Changed
 - `GitEditorStyles`: Reorganized members and added some new icons
 - `GitCommitWindow`: Rewrote `DrawToolbar()` to use standard IMGUI and cached icons
+- `EditorUtil`: Changed `GetLabelStyle()` to use `GitEditorStyles.Label` as a base
+- `GitTreeView`: Updated `DrawRow()` to provide a style to `EditorUtil.DrawLabelTruncated()`
 
 # [0.8.0] - 2022-06-05
 ## Editor

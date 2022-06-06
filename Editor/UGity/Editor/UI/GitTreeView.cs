@@ -399,18 +399,16 @@ namespace Octothorpe.UGity.Editor.UI
                 if(scope.changed)
                     SetIncluded(item, included);
             }
-
+            
             // Draw the file/directory name
             EditorGUI.LabelField(fileRect, fileLabel, GitEditorStyles.GetLabelStyle(item.File));
 
-            if(item.File.HasMergeConflict)
-                EditorGUI.LabelField(warningRect, conflictLabel);
-            else if(item.File.StateInTree == GitState.Deleted && item.File.StateInTree != GitState.Unmodified)
+            if(item.File.StateInTree == GitState.Deleted && item.File.StateInTree != GitState.Unmodified)
                 EditorGUI.LabelField(warningRect, warningLabel);
 
             // In flattened view, draw the smallest fitting file path right-aligned to the window
             if(!ShowHierarchy)
-                DrawLabelTruncated(rect, fileRect.x + fileRect.width, originalRect.width, item.Directory, '/', TruncateMode.Left);
+                DrawLabelTruncated(rect, fileRect.x + fileRect.width, originalRect.width, item.Directory, Color.gray.GetLabelStyle(), '/', TruncateMode.Left);
         }
 
         private void AddChild(GitTreeItem root, GitTreeItem child, ref int startId)

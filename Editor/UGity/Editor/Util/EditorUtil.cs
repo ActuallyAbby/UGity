@@ -50,7 +50,7 @@ namespace Octothorpe.UGity.Editor.Util
 
         public static GUIStyle GetLabelStyle(this Color color)
         {
-            GUIStyle colorStyle = new GUIStyle(EditorStyles.label);
+            GUIStyle colorStyle = new GUIStyle(GitEditorStyles.Label);
             colorStyle.normal.textColor = color;
             return colorStyle;
         }
@@ -190,7 +190,7 @@ namespace Octothorpe.UGity.Editor.Util
             return maxWidth;
         }
         
-        public static bool DrawLabelTruncated(Rect rect, float leftBound, float rightBound, string text, char? separator = ' ', TruncateMode mode = TruncateMode.Left)
+        public static bool DrawLabelTruncated(Rect rect, float leftBound, float rightBound, string text, GUIStyle style, char? separator = ' ', TruncateMode mode = TruncateMode.Left)
         {
             const string symbol = "...";
             const int symbolLength = 3;
@@ -260,7 +260,7 @@ namespace Octothorpe.UGity.Editor.Util
             if(!textFits)
                 content.text = null;
 
-            EditorGUI.LabelField(rect, content, GetLabelStyle(Color.gray));
+            EditorGUI.LabelField(rect, content, style);
             return textFits;
 
             bool IsWithinBounds() => leftBound <= rect.x && rect.x + rect.width <= rightBound;
