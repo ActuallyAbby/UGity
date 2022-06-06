@@ -24,6 +24,7 @@ Not sure how? Follow [these instructions](https://docs.unity3d.com/2020.2/Docume
     - Commit changes
     - Choose files to include or exclude in a commit
     - Amend the last commit
+    - Open modified files in the default difftool
 - Tagging:
     - Add tag post-commit
 - Pushing:
@@ -43,7 +44,6 @@ Not sure how? Follow [these instructions](https://docs.unity3d.com/2020.2/Docume
     - Execute commands and view the output in-editor with the Git Console
 
 ## NOT Current Features (yet)
-- **No in-editor diff tool, nor the ability to view the diff for a file (This is a top priority!)**
 - No assistance with merging or interactive rebasing
 - No viewing of commit history
 - No specific handling of submodules
@@ -56,7 +56,7 @@ Not sure how? Follow [these instructions](https://docs.unity3d.com/2020.2/Docume
 ![UGity - Branch Menu](https://user-images.githubusercontent.com/6188803/171977229-0f8f86c5-d593-4906-bb7f-dc90c8fc5e02.png)
 
 ### Commit Window
-![UGity - Commit Window](https://user-images.githubusercontent.com/6188803/171821132-60c9d437-9583-4f01-8e3b-a568f5876b76.png)
+![UGity - Commit Window](https://user-images.githubusercontent.com/6188803/172076625-af963213-4b4a-4435-9c59-0e56577bae5d.png)
 
 ### Commit Confirmation Dialog
 ![UGity - Commit Confirmation Dialog](https://user-images.githubusercontent.com/6188803/171821365-1e284614-8d27-480d-8222-20160e3fabd3.png)
