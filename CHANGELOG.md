@@ -1,5 +1,8 @@
 # [Unreleased]
 ## Editor
+### Added
+- Added merge conflict resolution. Merge conflicts will appear in the commit window where you can open a separate window to view all files, compare changes, and choose which version to keep
+
 ### Changed
 - Cleaned up the commit window toolbar
 
