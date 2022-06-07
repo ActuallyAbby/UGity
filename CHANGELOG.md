@@ -12,6 +12,7 @@
 
 ### Changed
 - `GitEditorStyles`: Reorganized members and added some new icons
+- `GitEditorStyles`: Change `Label` to be based off of `EditorStyles.label` rather than `GUI.skin.label`
 - `GitCommitWindow`: Rewrote `DrawToolbar()` to use standard IMGUI and cached icons
 - `EditorUtil`: Changed `GetLabelStyle()` to use `GitEditorStyles.Label` as a base
 - `GitTreeView`: Updated `DrawRow()` to provide a style to `EditorUtil.DrawLabelTruncated()`
