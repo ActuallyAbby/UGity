@@ -20,7 +20,7 @@ namespace Octothorpe.UGity.Editor
         public static readonly Texture2D DiffIcon = EditorUtil.LoadIcon("file-diff.png");
         public static readonly Texture2D CompareIcon = EditorUtil.LoadIcon("git-compare.png");
         public static readonly Texture2D GitIcon = EditorUtil.LoadIcon("git-color.png");
-        
+
         public static readonly Font FontMonospaced = EditorUtil.LoadFont("Inconsolata-Regular.ttf");
 
         public static GUIStyle ConfirmButton => confirmButton.Value;
@@ -51,7 +51,7 @@ namespace Octothorpe.UGity.Editor
         private static readonly Lazy<Texture2D> removeIcon = LazyIconContent("Toolbar Minus");
         private static readonly Lazy<Texture2D> addIcon = LazyIconContent("Toolbar Plus");
         private static readonly Lazy<Texture2D> hierarchyIcon = LazyIconContent("UnityEditor.HierarchyWindow");
-        
+
         private static readonly Lazy<GUIStyle> confirmButton = new Lazy<GUIStyle>(() => GUI.skin.button.Customize().WithMargin(8, 8, 8, 8).WithFixedHeight(32f));
 
         private static readonly Lazy<GUIStyle> commitSummaryItem = new Lazy<GUIStyle>(() => GUI.skin.label.Customize()
@@ -106,6 +106,14 @@ namespace Octothorpe.UGity.Editor
         public static GUIStyle GetLabelStyle(GitFile file) => GetFileColor(file).GetLabelStyle();
 
         public static GUIStyle GetSummaryLabelStyle(GitFile file) => CommitSummaryItem.Customize().WithTextColor(GUIState.Normal, GetFileColor(file));
+
+        public static Color GetStateColor(GitState state) => state switch
+        {
+            GitState.Added => ColorAdded,
+            GitState.Modified => ColorModified,
+            GitState.Deleted => ColorDeleted,
+            _ => ColorDefault,
+        };
 
         public static Color GetFileColor(GitFile file)
         {

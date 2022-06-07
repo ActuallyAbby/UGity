@@ -8,6 +8,7 @@
 - Added `GitMergeWindow`
 - `GitCommitWindow`: Added warning for unresolved merge conflicts; blocks committing and prompts to resolve conflicts
 - `EditorUtil`: Added parameter to `DrawLabelTruncated()` to provide a `GUIStyle`
+- `GitEditorStyles`: Added `GetStateColor()`
 
 ### Changed
 - `GitEditorStyles`: Reorganized members and added some new icons
